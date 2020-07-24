@@ -44,13 +44,12 @@ find_files () {
 		1- js | css (supported file extension)
 
 	find all files of certain type inside in_dir
-		- `-maxdepth` helps us specify only specified scope
 		- `find` returns the relative path, which is needed
 		- `*` acts as a recursive operator
 
 	Piped into grep to get all non minified files
 	'
-	find $in_dir -maxdepth 1 -type f -name "*.$1" | grep -v ".min.$1$"
+	find $in_dir -type f -name "*.$1" | grep -v ".min.$1$"
 }
 
 exec_minify_cmd () {
