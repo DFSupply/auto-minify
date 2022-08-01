@@ -102,8 +102,6 @@ exec_minify_cmd () {
 
 	if [[ $file == *.js ]]; then
 		exec_minify_js $file $out
-	elif [[ $file == *.css ]]; then
-		npx cleancss -o $out $file
 	fi
 }
 
@@ -143,14 +141,9 @@ if [ ! -z $out_dir ]; then
 fi
 
 js_files=$( find_files 'js' )
-css_files=$( find_files 'css' )
 
 set -e
 
 for file in $js_files; do
 	minify_file $file
-done
-
-for file in $css_files; do
-	minify_file	$file
 done
