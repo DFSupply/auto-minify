@@ -1,12 +1,12 @@
-FROM node:current-alpine
+FROM node:13.10
 
 WORKDIR /app/
 
 COPY package.json /app/package.json
 
-RUN apk add --no-cache bash coreutils \
- && apk add --no-cache --upgrade grep \
- && npm install
+RUN npm install
+
+RUN npm list
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
