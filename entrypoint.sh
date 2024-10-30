@@ -35,7 +35,12 @@ output_name () {
 		mkdir -p $f_path
 	fi
 
-	echo "$f_path/$f_name.min$f_extn" | xargs readlink -m
+	min_extn=".min"
+	if $overwrite; then
+		min_extn=""
+	fi
+
+	echo "$f_path/$f_name$min_extn$f_extn" | xargs readlink -m
 }
 
 find_files () {
@@ -63,7 +68,7 @@ find_files () {
 		MAXDEPTH_KEY=""
 	fi
 
-	find $in_dir ${MAXDEPTH_KEY} ${MAXDEPTH_VAL} -type f -name "*.$1" | grep -v ".min.$1$"
+	find $in_dir ${MAXDEPTH_KEY} ${MAXDEPTH_VAL} -type f -name "*.$1" -not \( -iname "*\.min.$1" \)
 }
 
 exec_minify_js () {
@@ -85,6 +90,28 @@ exec_minify_js () {
 		npx minify $file --out-file $out
 	elif [[ $js_engine == "uglify-js" ]]; then
 		npx uglifyjs $file --compress --mangle --output $out
+	fi
+}
+
+exec_minify_css () {
+	: '
+	arguments:
+		1- input file
+		2- output file
+
+	returns the command needed to minify the css file
+	based on the requested CSS Engine in the
+	input `css_engine` 
+	'
+	file=$1
+	out=$2
+
+	css_engine=$INPUT_CSS_ENGINE
+
+	if [[ $css_engine == "clean-css" ]]; then
+		npx cleancss -o $out $file
+	elif [[ $css_engine == "lightning" ]]; then
+		npx lightningcss --minify $file --output-file $out
 	fi
 }
 
@@ -142,8 +169,13 @@ fi
 
 js_files=$( find_files 'js' )
 
+file_set=$({
+	find_files 'js' &
+	find_files 'css' &
+})
+
 set -e
 
-for file in $js_files; do
+for file in $file_set; do
 	minify_file $file
 done

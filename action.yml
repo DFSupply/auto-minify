@@ -1,5 +1,5 @@
 name: "Auto Minify"
-description: "Minifies JS and CSS files with UglifyJS and CleanCSS"
+description: "Minifies JS and CSS files."
 
 author: "Nizar Mahmoud <nizarmah@hotmail.com>"
 
@@ -12,6 +12,10 @@ inputs:
     description: "Directory that contains the minified files. Defaults to same directory"
     required: false
     default: ""
+  overwrite:
+    description: "Overwrites the existing files with the minified version. Defaults to false."
+    required: false
+    default: "false"
   maxdepth:
     description: "Descend at most levels (a non-negative integer) levels of directories below the starting-points."
     required: false
@@ -20,6 +24,10 @@ inputs:
     description: "Specifies which of the supported packages minifies JS files."
     required: false
     default: "babel"
+  css_engine:
+    description: "Specifies which of the supported packages minifies CSS files."
+    required: false
+    default: "lightning"
 
 runs:
   using: "docker"

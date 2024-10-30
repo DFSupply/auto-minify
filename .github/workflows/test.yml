@@ -1,0 +1,180 @@
+name: test
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  directory:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test on affected directory
+        uses: ./
+        with:
+          directory: "tests/directory/affected"
+
+      - name: Assert not affected result does not exist
+        run: |
+          ! test -e tests/directory/not-affected/main.min.js
+
+      - name: Assert affected result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/directory/affected/main.expected.js \
+            tests/directory/affected/main.min.js
+
+  maxdepth:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test on shallow maxdepth
+        uses: ./
+        with:
+          directory: "tests/maxdepth"
+          maxdepth: 1
+
+      - name: Assert shallow result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/maxdepth/main.expected.js \
+            tests/maxdepth/main.min.js
+
+      - name: Assert deep result does not exist
+        run: |
+          ! test -e tests/maxdepth/not-affected/main.min.js
+
+  overwrite:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test overwrite
+        uses: ./
+        with:
+          directory: "tests/overwrite"
+          overwrite: true
+
+      - name: Assert overwrite result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/overwrite/main.expected.js \
+            tests/overwrite/main.js
+
+  output:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test output
+        uses: ./
+        with:
+          directory: "tests/output"
+          output: "tests/output/prod/js"
+
+      - name: Assert output directory is created
+        run: |
+          test -d tests/output/prod/js
+
+      - name: Assert output result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/output/main.expected.js \
+            tests/output/prod/js/main.min.js
+
+  js_engine_babel:
+    name: "js_engine / babel"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test js_engine babel
+        uses: ./
+        with:
+          directory: "tests/js_engine"
+          output: "tests/js_engine/babel"
+          js_engine: "babel"
+
+      - name: Assert js_engine babel result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/js_engine/babel/main.expected.js \
+            tests/js_engine/babel/main.min.js
+
+  js_engine_uglify_js:
+    name: "js_engine / uglify-js"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test js_engine uglify-js
+        uses: ./
+        with:
+          directory: "tests/js_engine"
+          output: "tests/js_engine/uglify-js"
+          js_engine: "uglify-js"
+
+      - name: Assert js_engine uglify-js result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/js_engine/uglify-js/main.expected.js \
+            tests/js_engine/uglify-js/main.min.js
+
+  css_engine_lightning:
+    name: "css_engine / lightning"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test css_engine lightning
+        uses: ./
+        with:
+          directory: "tests/css_engine"
+          output: "tests/css_engine/lightning"
+          css_engine: "lightning"
+
+      - name: Assert css_engine lightning result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/css_engine/lightning/main.expected.css \
+            tests/css_engine/lightning/main.min.css
+
+  css_engine_clean_css:
+    name: "css_engine / clean-css"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Test css_engine clean-css
+        uses: ./
+        with:
+          directory: "tests/css_engine"
+          output: "tests/css_engine/clean-css"
+          css_engine: "clean-css"
+
+      - name: Assert css_engine clean-css result matches expected
+        run: |
+          git diff --exit-code --no-index \
+            tests/css_engine/clean-css/main.expected.css \
+            tests/css_engine/clean-css/main.min.css
